@@ -1,21 +1,35 @@
 import PropTypes from "prop-types"; // prop으로 넘기는애들을 검사해준다.
 import Link from "next/link";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
 import { Menu, Input, Row, Col } from "antd";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+
 //반응형 -> 화면이 처음엔 mobile이었다가 크기가 바뀜에따라 컴포넌트 크기가 달라짐
 import UserProfile from "../components/UserProfile";
 import LoginForm from "../components/LoginForm";
-
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;
 `;
+const Global = createGlobalStyle`
+.ant-row {
+  margin-right : 0 !important;
+  margin-left : 0 !important;
+}
+.ant-col:first-child {
+  padding-left: 0 !important;
+}
+.ant-col:last-child {
+  padding-right : 0 !important;
+}
+`;
 
 const AppLayout = ({ children }) => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const { isLoggedIn } = useSelector((state) => state.user); //isLoggedIn 이 바뀌면 알아서 펑션컴포넌트가 리렌더링된다.
   return (
     <div>
+      <Global />
       <Menu mode="horizontal">
         <Menu.Item>
           <Link href="/">
@@ -41,11 +55,7 @@ const AppLayout = ({ children }) => {
         {/* gutter column간의 간격 */}
         {/* xs:모바일, sm:태블릿, md:작은 데스크탑 */}
         <Col xs={24} md={6}>
-          {isLoggedIn ? (
-            <UserProfile setIsLoggedIn={setLoggedIn} />
-          ) : (
-            <LoginForm setIsLoggedIn={setLoggedIn} />
-          )}
+          {isLoggedIn ? <UserProfile /> : <LoginForm />}
         </Col>
         {/* 모바일일 때는 24칸 차지, md는 6칸! n/24를 생각하면됨*/}
         <Col xs={24} md={12}>
