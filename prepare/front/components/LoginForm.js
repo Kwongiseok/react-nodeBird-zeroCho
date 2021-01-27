@@ -4,8 +4,8 @@ import Link from "next/link";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import useInput from "../hooks/useInput";
-import { useDispatch } from "react-redux";
-import { loginAction } from "../reducers/user";
+import { useDispatch, useSelector } from "react-redux";
+import { loginRequestAction } from "../reducers/user";
 const ButtonWrapper = styled.div`
   margin-top: 10px;
 `;
@@ -14,6 +14,7 @@ const FormWrapper = styled(Form)`
 `;
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const { isLoggingIn } = useSelector((state) => state.user);
   const [id, onChangeId] = useInput("");
   const [password, onChangePassword] = useInput("");
 
@@ -21,7 +22,7 @@ const LoginForm = () => {
     (e) => {
       // e.preventDefault(); onFinish에 적용되어있다 이미
       console.log(id, password);
-      dispatch(loginAction({ id, password }));
+      dispatch(loginRequestAction({ id, password }));
     },
     [id, password]
   );
@@ -45,7 +46,7 @@ const LoginForm = () => {
         />
       </div>
       <ButtonWrapper>
-        <Button type="primary" htmlType="submit" loading={false}>
+        <Button type="primary" htmlType="submit" loading={isLoggingIn}>
           로그인
         </Button>
         <Link href="/signup">
