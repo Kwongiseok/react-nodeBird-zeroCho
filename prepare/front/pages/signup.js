@@ -5,12 +5,16 @@ import { useCallback, useState } from "react";
 
 import AppLayout from "../components/AppLayout";
 import useInput from "../hooks/useInput";
+import { useDispatch, useSelector } from "react-redux";
 
 const ErrorMessage = styled.div`
   color: red;
 `;
 const Signup = () => {
-  const [id, onChangeId] = useInput("");
+  const dispatch = useDispatch();
+  const { signUpLoading } = useSelector((state) => state.user);
+
+  const [email, onChangeEmail] = useInput("");
   const [password, onChangePassword] = useInput("");
   const [nickname, onChangeNickname] = useInput("");
   const [passwordCheck, setPasswordCheck] = useState("");
@@ -35,8 +39,12 @@ const Signup = () => {
     if (!term) {
       return setTermError(true);
     }
-    console.log(id, nickname, password);
-  }, [password, passwordError, term]);
+    console.log(email, nickname, password);
+    dispatchEvent({
+      type: SIGU_UP_REQUEST,
+      data: { email, password, nickname },
+    });
+  }, [email, password, passwordError, term]);
   return (
     <AppLayout>
       <Head>
@@ -46,7 +54,13 @@ const Signup = () => {
         <div>
           <label htmlFor="user-id">아이디</label>
           <br />
-          <Input name="user-id" value={id} required onChange={onChangeId} />
+          <Input
+            type="email"
+            name="user-id"
+            value={email}
+            required
+            onChange={onChangeEmail}
+          />
         </div>
         <div>
           <label htmlFor="user-nick">닉네임</label>
@@ -90,7 +104,7 @@ const Signup = () => {
           {termError && <ErrorMessage>약관에 동의하셔야 합니다.</ErrorMessage>}
         </div>
         <div style={{ marginTop: 10 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={signUpLoading}>
             가입하기
           </Button>
         </div>

@@ -1,27 +1,30 @@
 import { Button, Form, Input } from "antd";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import useInput from "../hooks/useInput";
 import { addPost } from "../reducers/post";
 
 //스타일 처음에 인라인으로 하고, 나중에 최적화를 하면된다.
 const PostForm = (props) => {
-  const { imagePaths } = useSelector((state) => state.post);
-  const [text, setText] = useState("");
+  const { imagePaths, addPostDone } = useSelector((state) => state.post);
+  const [text, onChangeText, setText] = useInput();
   const imageInputRef = useRef(); // Ref 실제 돔에 접근하기 위해 사용
 
   const onClickImageUpload = useCallback(() => {
     imageInputRef.current.click();
   }, [imageInputRef.current]);
 
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value);
-  }, []);
+  useEffect(() => {
+    if (addPostDone) {
+      // post가 성공했을 때만 setText("") 수행
+      setText("");
+    }
+  }, [addPostDone]);
 
   const dispatch = useDispatch();
   const onSubmit = useCallback(() => {
-    dispatch(addPost); // 액션은 객체
-    setText("");
-  }, []);
+    dispatch(addPost(text)); // 액션은 객체
+  }, [text]);
   return (
     <Form style={{ margin: "10px 0 20px" }} onFinish={onSubmit}>
       <Input.TextArea

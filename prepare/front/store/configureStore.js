@@ -6,6 +6,7 @@ import reducer from "../reducers";
 import rootSaga from "../sagas";
 import createSagaMiddleware from "redux-saga";
 const configureStore = (props) => {
+  console.log(props);
   const sagaMiddleware = createSagaMiddleware();
   const middlewares = [sagaMiddleware];
   const enhancer =

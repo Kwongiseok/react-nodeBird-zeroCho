@@ -3,7 +3,6 @@ import Link from "next/link";
 import styled, { createGlobalStyle } from "styled-components";
 
 import { Menu, Input, Row, Col } from "antd";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 
 //반응형 -> 화면이 처음엔 mobile이었다가 크기가 바뀜에따라 컴포넌트 크기가 달라짐
@@ -26,7 +25,7 @@ const Global = createGlobalStyle`
 `;
 
 const AppLayout = ({ children }) => {
-  const { isLoggedIn } = useSelector((state) => state.user); //isLoggedIn 이 바뀌면 알아서 펑션컴포넌트가 리렌더링된다.
+  const { me } = useSelector((state) => state.user); //isLoggedIn 이 바뀌면 알아서 펑션컴포넌트가 리렌더링된다.
   return (
     <div>
       <Global />
@@ -55,7 +54,7 @@ const AppLayout = ({ children }) => {
         {/* gutter column간의 간격 */}
         {/* xs:모바일, sm:태블릿, md:작은 데스크탑 */}
         <Col xs={24} md={6}>
-          {isLoggedIn ? <UserProfile /> : <LoginForm />}
+          {me ? <UserProfile /> : <LoginForm />}
         </Col>
         {/* 모바일일 때는 24칸 차지, md는 6칸! n/24를 생각하면됨*/}
         <Col xs={24} md={12}>
