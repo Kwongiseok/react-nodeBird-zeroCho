@@ -1,4 +1,6 @@
+/* eslint-disable no-case-declarations */
 import shortId from "shortid";
+
 export const initialState = {
   mainPosts: [
     {
@@ -100,7 +102,7 @@ const dummyComment = (data) => ({
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_POST_REQUEST: //변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
+    case ADD_POST_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
       return {
         ...state,
         addPostLoading: true,
@@ -120,7 +122,7 @@ const reducer = (state = initialState, action) => {
         addPostLoading: false,
         addPostError: action.error,
       };
-    case REMOVE_POST_REQUEST: //변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
+    case REMOVE_POST_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
       return {
         ...state,
         removePostLoading: true,
@@ -140,7 +142,7 @@ const reducer = (state = initialState, action) => {
         removePostLoading: false,
         removePostError: action.error,
       };
-    case ADD_COMMENT_REQUEST: //변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
+    case ADD_COMMENT_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
       return {
         ...state,
         addCommentLoading: true,
@@ -155,7 +157,7 @@ const reducer = (state = initialState, action) => {
       const Comments = [dummyComment(action.data), ...post.Comments];
       const mainPosts = [...state.mainPosts];
       mainPosts[postIndex] = { ...post, Comments };
-      /*불변성 , 참조를 통해 바뀌는 것만 메모리 새로쓰고 나머지는 메모리를 아끼는 코드로 짬 */
+      /* 불변성 , 참조를 통해 바뀌는 것만 메모리 새로쓰고 나머지는 메모리를 아끼는 코드로 짬 */
       return {
         ...state,
         mainPosts,

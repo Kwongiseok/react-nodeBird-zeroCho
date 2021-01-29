@@ -74,11 +74,9 @@ export const loginRequestAction = (data) => {
   };
 };
 
-export const logoutRequestAction = () => {
-  return {
-    type: LOG_OUT_REQUEST,
-  };
-};
+export const logoutRequestAction = () => ({
+  type: LOG_OUT_REQUEST,
+});
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {

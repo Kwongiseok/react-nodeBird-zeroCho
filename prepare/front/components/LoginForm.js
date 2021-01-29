@@ -1,10 +1,12 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Form, Input, Button } from "antd";
 import { useCallback } from "react";
 import Link from "next/link";
 import styled from "styled-components";
-import useInput from "../hooks/useInput";
 import { useDispatch, useSelector } from "react-redux";
+import useInput from "../hooks/useInput";
 import { loginRequestAction } from "../reducers/user";
+
 const ButtonWrapper = styled.div`
   margin-top: 10px;
 `;
@@ -17,14 +19,11 @@ const LoginForm = () => {
   const [email, onChangeEmail] = useInput("");
   const [password, onChangePassword] = useInput("");
 
-  const onSubmitForm = useCallback(
-    (e) => {
-      // e.preventDefault(); onFinish에 적용되어있다 이미
-      console.log(email, password);
-      dispatch(loginRequestAction({ email, password }));
-    },
-    [email, password]
-  );
+  const onSubmitForm = useCallback(() => {
+    // e.preventDefault(); onFinish에 적용되어있다 이미
+    console.log(email, password);
+    dispatch(loginRequestAction({ email, password }));
+  }, [email, password]);
 
   return (
     <FormWrapper onFinish={onSubmitForm}>
