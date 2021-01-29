@@ -27,6 +27,7 @@ function* logIn(action) {
       data: action.data,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       // 비동기 액션 createor , 이벤트 리스너처럼 역할.
       type: LOG_IN_FAILURE,
@@ -70,7 +71,7 @@ function* signUp() {
     });
   } catch (err) {
     yield put({
-      type: SIGN_UP_FAIURE,
+      type: SIGN_UP_FAILURE,
       error: err.response.data,
     });
   }

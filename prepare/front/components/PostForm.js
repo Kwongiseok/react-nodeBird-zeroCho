@@ -25,6 +25,15 @@ const PostForm = (props) => {
   const onSubmit = useCallback(() => {
     dispatch(addPost(text)); // 액션은 객체
   }, [text]);
+  // const onSubmit = useCallback(() => {
+  //   dispatch({
+  //     type: "ADD_POST_REQUEST",
+  //     data: {
+  //       text,
+  //     },
+  //   });
+  // }, []);
+
   return (
     <Form style={{ margin: "10px 0 20px" }} onFinish={onSubmit}>
       <Input.TextArea

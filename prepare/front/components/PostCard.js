@@ -7,14 +7,16 @@ import {
 } from "@ant-design/icons";
 import { Button, Card, Comment, List, Popover } from "antd";
 import React, { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import PostImages from "./PostImages";
 import Avatar from "antd/lib/avatar/avatar";
 import CommentForm from "./CommentForm";
 import PostCardContent from "./postCardContent";
+import { REMOVE_POST_REQUEST } from "../reducers/post";
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
+  const { removePostLoading } = useSelector((state) => state.post);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
   const onToggleLiked = useCallback(() => {
     setLiked((prev) => !prev);
@@ -22,6 +24,14 @@ const PostCard = ({ post }) => {
   const onToggleComment = useCallback(() => {
     setCommentFormOpened((prev) => !prev);
   });
+
+  const dispatch = useDispatch();
+  const onRemovePost = useCallback(() => {
+    dispatch({
+      type: REMOVE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
   const { me } = useSelector((state) => state.user);
   const id = me && me.id;
   return (
@@ -47,7 +57,13 @@ const PostCard = ({ post }) => {
                 {id && post.User.id === id ? (
                   <>
                     <Button>수정</Button>
-                    <Button type="danger">삭제</Button>
+                    <Button
+                      type="danger"
+                      loading={removePostLoading}
+                      onClick={onRemovePost}
+                    >
+                      삭제
+                    </Button>
                   </>
                 ) : (
                   <Button>신고</Button>
@@ -92,10 +108,11 @@ PostCard.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.number,
     User: PropTypes.object,
+    UserId: PropTypes.number,
     content: PropTypes.string,
     createdAt: PropTypes.object,
     Comments: PropTypes.arrayOf(PropTypes.any),
     Images: PropTypes.arrayOf(PropTypes.any),
-  }),
+  }).isRequired,
 };
 export default PostCard;

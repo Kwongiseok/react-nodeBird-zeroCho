@@ -15,8 +15,7 @@ const UserProfile = () => {
         <div key="twit">
           짹짹
           <br />
-          {me.post.length}
-          <br />0
+          {me.Posts.length}
         </div>,
         <div key="followings">
           팔로잉

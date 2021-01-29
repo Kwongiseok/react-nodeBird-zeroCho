@@ -9,11 +9,11 @@ import PostForm from "../components/PostForm";
 
 // 모든 파일들을 코드 스플릿을 통해 개별적인 페이지(component)로 만들어준다.
 const Home = () => {
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { me } = useSelector((state) => state.user);
   const { mainPosts } = useSelector((state) => state.post);
   return (
     <AppLayout>
-      {isLoggedIn && <PostForm />}
+      {me && <PostForm />}
       {mainPosts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
