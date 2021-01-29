@@ -4,10 +4,10 @@ import styled, { createGlobalStyle } from "styled-components";
 
 import { Menu, Input, Row, Col } from "antd";
 import { useSelector } from "react-redux";
+// 반응형 -> 화면이 처음엔 mobile이었다가 크기가 바뀜에따라 컴포넌트 크기가 달라짐
+import UserProfile from "./UserProfile";
+import LoginForm from "./LoginForm";
 
-//반응형 -> 화면이 처음엔 mobile이었다가 크기가 바뀜에따라 컴포넌트 크기가 달라짐
-import UserProfile from "../components/UserProfile";
-import LoginForm from "../components/LoginForm";
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;
 `;
@@ -56,7 +56,7 @@ const AppLayout = ({ children }) => {
         <Col xs={24} md={6}>
           {me ? <UserProfile /> : <LoginForm />}
         </Col>
-        {/* 모바일일 때는 24칸 차지, md는 6칸! n/24를 생각하면됨*/}
+        {/* 모바일일 때는 24칸 차지, md는 6칸! n/24를 생각하면됨 */}
         <Col xs={24} md={12}>
           {children}
         </Col>

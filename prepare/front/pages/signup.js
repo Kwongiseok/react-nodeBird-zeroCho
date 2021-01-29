@@ -3,9 +3,10 @@ import styled from "styled-components";
 import { Form, Input, Checkbox, Button } from "antd";
 import { useCallback, useState } from "react";
 
+import { useDispatch, useSelector } from "react-redux";
 import AppLayout from "../components/AppLayout";
 import useInput from "../hooks/useInput";
-import { useDispatch, useSelector } from "react-redux";
+import { SIGN_UP_REQUEST } from "../reducers/user";
 
 const ErrorMessage = styled.div`
   color: red;
@@ -40,8 +41,8 @@ const Signup = () => {
       return setTermError(true);
     }
     console.log(email, nickname, password);
-    dispatchEvent({
-      type: SIGU_UP_REQUEST,
+    dispatch({
+      type: SIGN_UP_REQUEST,
       data: { email, password, nickname },
     });
   }, [email, password, passwordError, term]);

@@ -9,11 +9,13 @@ import { Button, Card, Comment, List, Popover } from "antd";
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import PostImages from "./PostImages";
 import Avatar from "antd/lib/avatar/avatar";
+import PostImages from "./PostImages";
 import CommentForm from "./CommentForm";
 import PostCardContent from "./postCardContent";
 import { REMOVE_POST_REQUEST } from "../reducers/post";
+import FollowButton from "./FollowButton";
+
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
   const { removePostLoading } = useSelector((state) => state.post);
@@ -74,6 +76,7 @@ const PostCard = ({ post }) => {
             <EllipsisOutlined />
           </Popover>,
         ]}
+        extra={id && <FollowButton post={post} />}
       >
         <Card.Meta
           avatar={<Avatar>{post.User.nickname[0]}</Avatar>}

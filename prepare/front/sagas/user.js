@@ -10,7 +10,58 @@ import {
   SIGN_UP_SUCCESS,
   SIGN_UP_REQUEST,
   SIGN_UP_FAILURE,
+  FOLLOW_REQUEST,
+  UNFOLLOW_REQUEST,
+  FOLLOW_FAILURE,
+  FOLLOW_SUCCESS,
+  UNFOLLOW_SUCCESS,
+  UNFOLLOW_FAILURE,
 } from "../reducers/user";
+function followAPI(data) {
+  return axios.post("/api/login", data); // 실제 서버에 요청을 보낸다.
+}
+
+function* follow(action) {
+  // 아래 take를 통해 logIn 이 실행되면 액션 자체가 매개변수로 실행이 된다
+  try {
+    // const result = yield call(logInAPI, action.data);
+    yield delay(1000);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: FOLLOW_SUCCESS,
+      data: action.data, // post.User.id 를 넘겨받았다.
+    });
+  } catch (err) {
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: FOLLOW_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+function unfollowAPI(data) {
+  return axios.post("/api/login", data); // 실제 서버에 요청을 보낸다.
+}
+
+function* unfollow(action) {
+  // 아래 take를 통해 logIn 이 실행되면 액션 자체가 매개변수로 실행이 된다
+  try {
+    // const result = yield call(logInAPI, action.data);
+    yield delay(1000);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: UNFOLLOW_SUCCESS,
+      data: action.data, // post.User.id 를 넘겨받았다.
+    });
+  } catch (err) {
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: UNFOLLOW_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function logInAPI(data) {
   return axios.post("/api/login", data); // 실제 서버에 요청을 보낸다.
 }
@@ -76,6 +127,12 @@ function* signUp() {
     });
   }
 }
+function* watchFollow() {
+  yield takeLatest(FOLLOW_REQUEST, follow);
+}
+function* watchUnfollow() {
+  yield takeLatest(UNFOLLOW_REQUEST, unfollow);
+}
 function* watchLogIn() {
   //   yield take("LOG_IN_REQUEST", logIn); // take LOG_IN -> LOG_IN 이라는 액션이 실행될 때까지 기다리겠다.
   // 액션이 실행되면 logIn 이라는 함수를 실행하겠다.
@@ -96,5 +153,11 @@ function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 export default function* userSaga() {
-  yield all([fork(watchLogIn), fork(watchLogOut), fork(watchSignUp)]);
+  yield all([
+    fork(watchFollow), //
+    fork(watchUnfollow),
+    fork(watchLogIn),
+    fork(watchLogOut),
+    fork(watchSignUp),
+  ]);
 }

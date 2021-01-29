@@ -1,5 +1,14 @@
-import { all, fork, put, takeLatest, delay } from "redux-saga/effects";
+/* eslint-disable max-len */
+import {
+  all,
+  fork,
+  put,
+  takeLatest,
+  delay,
+  throttle,
+} from "redux-saga/effects";
 import shortId from "shortid";
+import axios from "axios";
 import {
   ADD_POST_SUCCESS,
   ADD_POST_REQUEST,
@@ -10,13 +19,37 @@ import {
   REMOVE_POST_SUCCESS,
   REMOVE_POST_REQUEST,
   REMOVE_POST_FAILURE,
+  LOAD_POSTS_REQUEST,
+  LOAD_POSTS_SUCCESS,
+  LOAD_POSTS_FAILURE,
+  generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
-import axios from "axios";
+
+function loadPostsAPI(data) {
+  return axios.get("/api/post", data); // 실제 서버에 요청을 보낸다.
+}
+function* loadPosts() {
+  try {
+    // const result = yield call(addPostAPI, action.data);
+    yield delay(1000);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: LOAD_POSTS_SUCCESS,
+      data: generateDummyPost(10),
+    });
+  } catch (err) {
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: LOAD_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function addPostAPI(data) {
   return axios.post("/api/post", data); // 실제 서버에 요청을 보낸다.
 }
-
 function* addPost(action) {
   try {
     // const result = yield call(addPostAPI, action.data);
@@ -50,7 +83,6 @@ function* removePost(action) {
   try {
     // const result = yield call(addPostAPI, action.data);
     yield delay(1000);
-    const id = shortId.generate();
     yield put({
       // post reducer 조작 부분
       // put은 dispatch 기능이라 볼 수 있다.
@@ -92,6 +124,10 @@ function* addComment(action) {
     });
   }
 }
+
+function* watchLoadPosts() {
+  yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
+}
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
@@ -102,5 +138,10 @@ function* watchAddComment() {
   yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 export default function* postSaga() {
-  yield all([fork(watchAddPost), fork(watchRemovePost), fork(watchAddComment)]);
+  yield all([
+    fork(watchLoadPosts),
+    fork(watchAddPost),
+    fork(watchRemovePost),
+    fork(watchAddComment),
+  ]);
 }

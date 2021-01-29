@@ -25,6 +25,9 @@
     "object-curly-newline": "off",
     "linebreak-style": "off",
     "no-param-reassign": "off",
-    "quotes": [2, "double", { "avoidEscape": false }]
+    "quotes": [2, "double", { "avoidEscape": false }],
+    "react/react-in-jsx-scope": "off",
+    "react/no-array-index-key": "off",
+    "max-len": "off"
   }
 }
