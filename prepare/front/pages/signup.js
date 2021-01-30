@@ -77,6 +77,7 @@ const Signup = () => {
           <label htmlFor="user-password">비밀번호</label>
           <br />
           <Input
+            type="password"
             name="user-password"
             value={password}
             required
@@ -87,6 +88,7 @@ const Signup = () => {
           <label htmlFor="user-password-check">비밀번호 체크</label>
           <br />
           <Input
+            type="password"
             name="user-password-check"
             value={passwordCheck}
             required

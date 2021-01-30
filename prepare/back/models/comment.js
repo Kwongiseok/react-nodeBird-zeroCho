@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   Comment.associate = (db) => {
-    db.Comment.belongsTo(db.User);
-    db.Comment.belongTo(db.Post);
+    db.Comment.belongsTo(db.User); // 하나의 comment를 작성한 유저는 한명
+    db.Comment.belongsTo(db.Post); // 하나의 코멘트는 반드시 하나의 post에 속함
   };
   return Comment;
 };

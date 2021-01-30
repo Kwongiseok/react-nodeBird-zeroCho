@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       charset: "utf8mb4",
-      collate: "utfmb4_general_ci", // 이모티콘+한글 저장
+      collate: "utf8mb4_general_ci", // 이모티콘+한글 저장
     }
   );
   Post.associate = (db) => {
     db.Post.belongsTo(db.User); // post 작성자
-    db.Post.belongsToMany(db.Hashtag); // Many-Many 관계
+    db.Post.belongsToMany(db.Hashtag, { through: "PostHashtag" }); // Many-Many 관계
     db.Post.hasMany(db.Comment);
     db.Post.hasMany(db.Image);
     db.Post.belongsTo(db.Post, { as: "Retweet" }); // 리트윗
