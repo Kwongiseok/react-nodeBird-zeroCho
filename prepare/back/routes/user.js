@@ -21,7 +21,7 @@ router.post("/", async (req, res, next) => {
       nickname: req.body.nickname,
       password: hashedPassword,
     }); // 비동기 작동 순서를 맞춰주기 위한 await
-    res.status(200).send("ok"); // 성공적인 요청 200
+    res.status(200).send("okay"); // 성공적인 요청 200
   } catch (error) {
     console.log(error);
     next(error); // next로 처리하면 한방에 에러를 처리해준다.
