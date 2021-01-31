@@ -16,9 +16,35 @@ import {
   FOLLOW_SUCCESS,
   UNFOLLOW_SUCCESS,
   UNFOLLOW_FAILURE,
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_FAILURE,
+  LOAD_MY_INFO_SUCCESS,
 } from "../reducers/user";
+function loadUserAPI() {
+  return axios.get("/user"); // 실제 서버에 요청을 보낸다.
+}
+
+function* loadUser() {
+  // 아래 take를 통해 loadUser 이 실행되면 액션 자체가 매개변수로 실행이 된다
+  try {
+    const result = yield call(loadUserAPI);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.log(err);
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: LOAD_MY_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function followAPI(data) {
-  return axios.post("/api/login", data); // 실제 서버에 요청을 보낸다.
+  return axios.post("/follow", data); // 실제 서버에 요청을 보낸다.
 }
 
 function* follow(action) {
@@ -40,7 +66,7 @@ function* follow(action) {
   }
 }
 function unfollowAPI(data) {
-  return axios.post("/api/login", data); // 실제 서버에 요청을 보낸다.
+  return axios.post("/unfollow", data); // 실제 서버에 요청을 보낸다.
 }
 
 function* unfollow(action) {
@@ -63,19 +89,17 @@ function* unfollow(action) {
 }
 
 function logInAPI(data) {
-  return axios.post("/api/login", data); // 실제 서버에 요청을 보낸다.
+  return axios.post("/user/login", data); // 실제 서버에 요청을 보낸다.
 }
 
 function* logIn(action) {
   // 아래 take를 통해 logIn 이 실행되면 액션 자체가 매개변수로 실행이 된다
   try {
-    console.log("saga login");
-    // const result = yield call(logInAPI, action.data);
-    yield delay(1000);
+    const result = yield call(logInAPI, action.data);
     yield put({
       // put은 dispatch 기능이라 볼 수 있다.
       type: LOG_IN_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     console.log(err);
@@ -87,14 +111,12 @@ function* logIn(action) {
   }
 }
 function logOutAPI() {
-  return axios.post("/api/logout"); // 실제 서버에 요청을 보낸다.
+  return axios.post("/user/logout"); // 실제 서버에 요청을 보낸다.
 }
 
 function* logOut() {
   try {
-    // const result = yield call(logOutAPI);
-    yield delay(1000);
-
+    yield call(logOutAPI);
     yield put({
       // put은 dispatch 기능이라 볼 수 있다.
       type: LOG_OUT_SUCCESS,
@@ -110,7 +132,7 @@ function* logOut() {
 }
 
 function signUpAPI(data) {
-  return axios.post("'http://localhost:3060/user", data);
+  return axios.post("/user", data);
 }
 
 function* signUp(action) {
@@ -126,6 +148,9 @@ function* signUp(action) {
       error: err.response.data,
     });
   }
+}
+function* watchLoadUser() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadUser);
 }
 function* watchFollow() {
   yield takeLatest(FOLLOW_REQUEST, follow);
@@ -154,6 +179,7 @@ function* watchSignUp() {
 }
 export default function* userSaga() {
   yield all([
+    fork(watchLoadUser),
     fork(watchFollow), //
     fork(watchUnfollow),
     fork(watchLogIn),

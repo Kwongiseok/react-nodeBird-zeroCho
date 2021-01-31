@@ -1,9 +1,10 @@
 import Head from "next/head";
 import styled from "styled-components";
 import { Form, Input, Checkbox, Button } from "antd";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
+import Router from "next/router";
 import AppLayout from "../components/AppLayout";
 import useInput from "../hooks/useInput";
 import { SIGN_UP_REQUEST } from "../reducers/user";
@@ -13,7 +14,27 @@ const ErrorMessage = styled.div`
 `;
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading } = useSelector((state) => state.user);
+  const { me, signUpLoading, signUpDone, signUpError } = useSelector(
+    (state) => state.user
+  );
+
+  useEffect(() => {
+    if (me && me.id) {
+      Router.replace("/"); // 이전 페이지가 삭제( 뒤로 가기 불가능 )
+    }
+  }, [me && me.id]);
+
+  useEffect(() => {
+    if (signUpDone) {
+      Router.replace("/");
+    }
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
 
   const [email, onChangeEmail] = useInput("");
   const [password, onChangePassword] = useInput("");

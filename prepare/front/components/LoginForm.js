@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Form, Input, Button } from "antd";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,7 +15,7 @@ const FormWrapper = styled(Form)`
 `;
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { logInLoading } = useSelector((state) => state.user);
+  const { logInLoading, logInError } = useSelector((state) => state.user);
   const [email, onChangeEmail] = useInput("");
   const [password, onChangePassword] = useInput("");
 
@@ -24,7 +24,11 @@ const LoginForm = () => {
     console.log(email, password);
     dispatch(loginRequestAction({ email, password }));
   }, [email, password]);
-
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
   return (
     <FormWrapper onFinish={onSubmitForm}>
       {/* antd에서는 onFinish <- submit 이며 preventDefault가 적용되어있음 */}
@@ -43,6 +47,7 @@ const LoginForm = () => {
         <label htmlFor="user-password">비밀번호</label>
         <br />
         <Input
+          type="password"
           name="user-password"
           value={password}
           onChange={onChangePassword}

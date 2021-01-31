@@ -6,8 +6,8 @@ import {
   takeLatest,
   delay,
   throttle,
+  call,
 } from "redux-saga/effects";
-import shortId from "shortid";
 import axios from "axios";
 import {
   ADD_POST_SUCCESS,
@@ -22,21 +22,19 @@ import {
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
   LOAD_POSTS_FAILURE,
-  generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 
 function loadPostsAPI(data) {
-  return axios.get("/api/post", data); // 실제 서버에 요청을 보낸다.
+  return axios.get("/posts", data); // 실제 서버에 요청을 보낸다.
 }
-function* loadPosts() {
+function* loadPosts(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
+    const result = yield call(loadPostsAPI, action.data);
     yield put({
       // put은 dispatch 기능이라 볼 수 있다.
       type: LOAD_POSTS_SUCCESS,
-      data: generateDummyPost(10),
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -48,24 +46,19 @@ function* loadPosts() {
 }
 
 function addPostAPI(data) {
-  return axios.post("/api/post", data); // 실제 서버에 요청을 보낸다.
+  return axios.post("/post", { content: data }); // 실제 서버에 요청을 보낸다.
 }
 function* addPost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
-    const id = shortId.generate();
+    const result = yield call(addPostAPI, action.data);
     yield put({
       // put은 dispatch 기능이라 볼 수 있다.
       type: ADD_POST_SUCCESS,
-      data: {
-        id,
-        content: action.data,
-      },
+      data: result.data,
     });
     yield put({
       type: ADD_POST_TO_ME,
-      data: id,
+      data: result.data.id,
     });
   } catch (err) {
     yield put({
@@ -103,20 +96,19 @@ function* removePost(action) {
   }
 }
 function addCommentAPI(data) {
-  return axios.post(`/api/post/${data.postId}/comment`, data); // 실제 서버에 요청을 보낸다.
+  return axios.post(`/post/${data.postId}/comment`, data); // 실제 서버에 요청을 보낸다.
 }
 
 function* addComment(action) {
   try {
-    // const result = yield call(addCommentAPI, action.data);
-    yield delay(1000);
-
+    const result = yield call(addCommentAPI, action.data);
     yield put({
       // put은 dispatch 기능이라 볼 수 있다.
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
+    console.log(err);
     yield put({
       // 비동기 액션 createor , 이벤트 리스너처럼 역할.
       type: ADD_COMMENT_FAILURE,

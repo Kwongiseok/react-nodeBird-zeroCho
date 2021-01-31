@@ -1,6 +1,9 @@
 import produce from "immer";
 
 export const initialState = {
+  loadUserLoading: false, // 유저 정보 가져오기 시도중
+  loadUserDone: false,
+  loadUserError: null,
   followLoading: false, // 팔로우 시도중
   followDone: false,
   followError: null,
@@ -23,6 +26,10 @@ export const initialState = {
   signUpData: {},
   loginData: {},
 };
+
+export const LOAD_MY_INFO_REQUEST = "LOAD_MY_INFO_REQUEST";
+export const LOAD_MY_INFO_SUCCESS = "LOAD_MY_INFO_SUCCESS";
+export const LOAD_MY_INFO_FAILURE = "LOAD_MY_INFO_FAILURE";
 
 export const LOG_IN_REQUEST = "LOG_IN_REQUEST";
 export const LOG_IN_SUCCESS = "LOG_IN_SUUCCESS";
@@ -51,23 +58,6 @@ export const UNFOLLOW_FAILURE = "UNFOLLOW_FAILURE";
 export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
 export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
 
-const dummyUser = (data) => ({
-  ...data,
-  nickname: "Giseok",
-  id: 1,
-  Posts: [{ id: 1 }],
-  Followings: [
-    { nickname: "핀터" },
-    { nickname: "plug" },
-    { nickname: "플러그" },
-  ],
-  Followers: [
-    { nickname: "핀터" },
-    { nickname: "plug" },
-    { nickname: "플러그" },
-  ],
-});
-
 export const loginRequestAction = (data) => {
   console.log("login reducer");
   return {
@@ -84,6 +74,20 @@ const reducer = (state = initialState, action) =>
   produce(state, (draft) => {
     // draft를 보고 immer가 불변성있게 만들어준다.
     switch (action.type) {
+      case LOAD_MY_INFO_REQUEST:
+        draft.loadUserLoading = true;
+        draft.loadUserError = null;
+        draft.loadUserDone = false;
+        break;
+      case LOAD_MY_INFO_SUCCESS:
+        draft.loadUserLoading = false;
+        draft.me = action.data;
+        draft.loadUserDone = true;
+        break;
+      case LOAD_MY_INFO_FAILURE:
+        draft.loadUserLoading = false;
+        draft.loadUserError = action.error;
+        break;
       case FOLLOW_REQUEST:
         draft.followLoading = true;
         draft.followError = null;
@@ -122,7 +126,7 @@ const reducer = (state = initialState, action) =>
       case LOG_IN_SUCCESS:
         draft.logInLoading = false;
         draft.logInDone = true;
-        draft.me = dummyUser(action.data);
+        draft.me = action.data; // user.json()이 action.data
         break;
       case LOG_IN_FAILURE:
         draft.logInLoading = false;
