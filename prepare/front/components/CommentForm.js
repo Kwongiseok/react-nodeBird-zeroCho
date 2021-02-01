@@ -1,9 +1,10 @@
 import { Form, Button, Input } from "antd";
 import React, { useCallback, useEffect } from "react";
-import useInput from "../hooks/useInput";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
+import useInput from "../hooks/useInput";
 import { ADD_COMMENT_REQUEST } from "../reducers/post";
+
 const CommentForm = ({ post }) => {
   const id = useSelector((state) => state.user.me && state.user.me.id);
   const { addCommentDone, addCommentLoading } = useSelector(

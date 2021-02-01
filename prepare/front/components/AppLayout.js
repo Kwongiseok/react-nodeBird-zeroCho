@@ -25,7 +25,7 @@ const Global = createGlobalStyle`
 `;
 
 const AppLayout = ({ children }) => {
-  const { me } = useSelector((state) => state.user); //isLoggedIn 이 바뀌면 알아서 펑션컴포넌트가 리렌더링된다.
+  const { me } = useSelector((state) => state.user); // isLoggedIn 이 바뀌면 알아서 펑션컴포넌트가 리렌더링된다.
   return (
     <div>
       <Global />

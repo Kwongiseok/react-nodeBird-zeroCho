@@ -5,6 +5,12 @@ export const initialState = {
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
+  likePostLoading: false,
+  likePostDone: false,
+  likePostError: null,
+  unlikePostLoading: false,
+  unlikePostDone: false,
+  unlikePostError: null,
   loadPostsLoading: false,
   loadPostsDone: false,
   loadPostsError: null,
@@ -18,6 +24,14 @@ export const initialState = {
   addCommentDone: false,
   addCommentError: null,
 };
+
+export const LIKE_POST_REQUEST = "LIKE_POST_REQUEST";
+export const LIKE_POST_SUCCESS = "LIKE_POST_SUCCESS";
+export const LIKE_POST_FAILURE = "LIKE_POST_FAILURE";
+
+export const UNLIKE_POST_REQUEST = "UNLIKE_POST_REQUEST";
+export const UNLIKE_POST_SUCCESS = "UNLIKE_POST_SUCCESS";
+export const UNLIKE_POST_FAILURE = "UNLIKE_POST_FAILURE";
 
 export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
 export const LOAD_POSTS_SUCCESS = "LOAD_POSTS_SUCCESS";
@@ -50,6 +64,43 @@ const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     // immer 사용 -> 불변성을 지켜주는 역할을 한다.
     switch (action.type) {
+      case UNLIKE_POST_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
+        draft.unlikePostsLoading = true; // state대신 draft 사용
+        draft.unlikePostsDone = false;
+        draft.unlikePostsError = null;
+        break;
+      case UNLIKE_POST_SUCCESS:
+        const postUnlike = draft.mainPosts.find(
+          (v) => v.id === action.data.PostId
+        );
+        postUnlike.Likers = postUnlike.Likers.filter(
+          (v) => v.id !== action.data.UserId
+        );
+        draft.unlikePostsDone = true;
+        break;
+      case UNLIKE_POST_FAILURE:
+        draft.unlikePostsLoading = false;
+        draft.unlikePostsError = action.Error;
+        break;
+
+      case LIKE_POST_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
+        draft.likePostsLoading = true; // state대신 draft 사용
+        draft.likePostsDone = false;
+        draft.likePostsError = null;
+        break;
+      case LIKE_POST_SUCCESS:
+        const postLike = draft.mainPosts.find(
+          (v) => v.id === action.data.PostId
+        );
+        postLike.Likers.push({ id: action.data.UserId });
+        draft.likePostsLoading = false;
+        draft.likePostsDone = true;
+        break;
+      case LIKE_POST_FAILURE:
+        draft.likePostsLoading = false;
+        draft.likePostsError = action.Error;
+        break;
+
       case LOAD_POSTS_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
         draft.loadPostsLoading = true; // state대신 draft 사용
         draft.loadPostsDone = false;

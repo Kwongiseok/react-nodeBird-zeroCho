@@ -22,8 +22,53 @@ import {
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
   LOAD_POSTS_FAILURE,
+  LIKE_POST_REQUEST,
+  UNLIKE_POST_REQUEST,
+  LIKE_POST_SUCCESS,
+  LIKE_POST_FAILURE,
+  UNLIKE_POST_SUCCESS,
+  UNLIKE_POST_FAILURE,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
+
+function likePostAPI(data) {
+  return axios.patch(`/post/${data}/like`); // 실제 서버에 요청을 보낸다.
+}
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: LIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: LIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+function unlikePostAPI(data) {
+  return axios.delete(`/post/${data}/like`); // 실제 서버에 요청을 보낸다.
+}
+function* unlikePost(action) {
+  try {
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: UNLIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 function loadPostsAPI(data) {
   return axios.get("/posts", data); // 실제 서버에 요청을 보낸다.
@@ -117,6 +162,14 @@ function* addComment(action) {
   }
 }
 
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+function* watchUnlikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
+}
+
 function* watchLoadPosts() {
   yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
 }
@@ -131,6 +184,8 @@ function* watchAddComment() {
 }
 export default function* postSaga() {
   yield all([
+    fork(watchLikePost),
+    fork(watchUnlikePost),
     fork(watchLoadPosts),
     fork(watchAddPost),
     fork(watchRemovePost),
