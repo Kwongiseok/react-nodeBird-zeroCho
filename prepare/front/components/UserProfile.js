@@ -2,6 +2,7 @@ import { Card, Avatar, Button } from "antd";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutRequestAction } from "../reducers/user";
+
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { me, logOutLoading } = useSelector((state) => state.user);
