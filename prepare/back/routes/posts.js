@@ -1,19 +1,25 @@
 const express = require("express");
-const { Post, User, Image, Comment } = require("../models");
+const { Op } = require("sequelize");
+
+const { Post, Image, User, Comment } = require("../models");
 
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   // GET /posts
   try {
+    const where = {};
+    if (parseInt(req.query.lastId, 10)) {
+      // 초기 로딩이 아닐 때
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+    } // 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
     const posts = await Post.findAll({
+      where,
       limit: 10,
       order: [
         ["createdAt", "DESC"],
-        [Comment, "createdAt", "DESC"], // 댓글 내림차순 정렬
+        [Comment, "createdAt", "DESC"],
       ],
-      // lastId: 0, // offset의 경우 데이터가 삭제, 추가 될 때 문제가 발생한다.
-      // lastId 해당부분이 삭제되더라도 lastId 보다 작은 값이 대체되어 실행되어 문제가 발생하지 않는다.
       include: [
         {
           model: User,
@@ -36,13 +42,26 @@ router.get("/", async (req, res, next) => {
           as: "Likers",
           attributes: ["id"],
         },
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
       ],
     });
     console.log(posts);
     res.status(200).json(posts);
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 });
 
