@@ -5,6 +5,7 @@
 // import React from 'react';
 // Next가 'pages'폴더(무조건 pages이름) Next가 인식해서
 
+import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { END } from "redux-saga";
@@ -65,7 +66,14 @@ const Home = () => {
 };
 
 export const getServerSideProps = wrapper.getServerSideProps(
+  // HYDRATE -> 서버사이드 렌더링이 완료됐을 때 실행되는 액션
   async (context) => {
+    const cookie = context.req ? context.req.headers.cookie : "";
+    // axios.defaults.headers.Cookie = cookie; // 다른 사람이 요청을 보냈을 때도, 내 정보로 로그인 되버리는 오류가 발생할 수 있다.
+    axios.defaults.headers.Cookie = "";
+    if (context.req && cookie) {
+      axios.defaults.headers.Cookie = cookie;
+    }
     // next에서 제공하는 wrapper로 만든 wrapper를 가져와 실행한다. -> 이 부분이 Home 보다 먼저 실행된다.
     context.store.dispatch({
       type: LOAD_MY_INFO_REQUEST,

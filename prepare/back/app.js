@@ -11,6 +11,8 @@ const path = require("path");
 const postRouter = require("./routes/post");
 const postsRouter = require("./routes/posts");
 const userRouter = require("./routes/user");
+const hashtagRouter = require("./routes/hashtag");
+
 const passportConfig = require("./passport");
 
 dotenv.config();
@@ -50,6 +52,7 @@ app.use(passport.session()); // 미들웨어들
 app.use("/posts", postsRouter);
 app.use("/post", postRouter);
 app.use("/user", userRouter);
+app.use("/hashtag", hashtagRouter);
 
 /* 에러 처리 미들웨어가 내부적으로 존재한다, 우리가 직접 바꿔줄 수 있다. */
 // app.use((err,req,res,next) => {

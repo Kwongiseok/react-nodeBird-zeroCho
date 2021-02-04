@@ -31,6 +31,9 @@ import {
   LOAD_FOLLOWERS_FAILURE,
   LOAD_FOLLOWINGS_SUCCESS,
   LOAD_FOLLOWINGS_FAILURE,
+  LOAD_USER_REQUEST,
+  LOAD_USER_SUCCESS,
+  LOAD_USER_FAILURE,
 } from "../reducers/user";
 function removeFollowerAPI(data) {
   return axios.delete(`/user/follower/${data}`);
@@ -115,14 +118,14 @@ function* changeNickname(action) {
   }
 }
 
-function loadUserAPI() {
+function loadMyInfoAPI() {
   return axios.get("/user"); // 실제 서버에 요청을 보낸다.
 }
 
-function* loadUser() {
-  // 아래 take를 통해 loadUser 이 실행되면 액션 자체가 매개변수로 실행이 된다
+function* loadMyInfo(action) {
+  // 아래 take를 통해 loadMyInfo 이 실행되면 액션 자체가 매개변수로 실행이 된다
   try {
-    const result = yield call(loadUserAPI);
+    const result = yield call(loadMyInfoAPI);
     yield put({
       // put은 dispatch 기능이라 볼 수 있다.
       type: LOAD_MY_INFO_SUCCESS,
@@ -133,6 +136,29 @@ function* loadUser() {
     yield put({
       // 비동기 액션 createor , 이벤트 리스너처럼 역할.
       type: LOAD_MY_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadUserAPI(data) {
+  return axios.get(`/user/${data}`); // 실제 서버에 요청을 보낸다.
+}
+
+function* loadUser(action) {
+  // 아래 take를 통해 loadUser 이 실행되면 액션 자체가 매개변수로 실행이 된다
+  try {
+    const result = yield call(loadUserAPI, action.data);
+    yield put({
+      // put은 dispatch 기능이라 볼 수 있다.
+      type: LOAD_USER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.log(err);
+    yield put({
+      // 비동기 액션 createor , 이벤트 리스너처럼 역할.
+      type: LOAD_USER_FAILURE,
       error: err.response.data,
     });
   }
@@ -254,8 +280,11 @@ function* watchLoadFollowings() {
 function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
 }
+function* watchLoadMyInfo() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
 function* watchLoadUser() {
-  yield takeLatest(LOAD_MY_INFO_REQUEST, loadUser);
+  yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
 function* watchFollow() {
   yield takeLatest(FOLLOW_REQUEST, follow);
@@ -282,14 +311,16 @@ function* watchLogOut() {
 function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
+
 export default function* userSaga() {
   yield all([
     fork(watchRemoveFollower),
     fork(watchLoadFollowers),
     fork(watchLoadFollowings),
     fork(watchChangeNickname),
+    fork(watchLoadMyInfo),
     fork(watchLoadUser),
-    fork(watchFollow), //
+    fork(watchFollow),
     fork(watchUnfollow),
     fork(watchLogIn),
     fork(watchLogOut),

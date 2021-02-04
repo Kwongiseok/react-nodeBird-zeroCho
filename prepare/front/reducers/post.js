@@ -3,6 +3,7 @@ import produce from "immer";
 
 export const initialState = {
   mainPosts: [],
+  singlePost: null,
   imagePaths: [],
   hasMorePosts: true,
   likePostLoading: false,
@@ -11,6 +12,9 @@ export const initialState = {
   unlikePostLoading: false,
   unlikePostDone: false,
   unlikePostError: null,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
   loadPostsLoading: false,
   loadPostsDone: false,
   loadPostsError: null,
@@ -42,6 +46,18 @@ export const LIKE_POST_FAILURE = "LIKE_POST_FAILURE";
 export const UNLIKE_POST_REQUEST = "UNLIKE_POST_REQUEST";
 export const UNLIKE_POST_SUCCESS = "UNLIKE_POST_SUCCESS";
 export const UNLIKE_POST_FAILURE = "UNLIKE_POST_FAILURE";
+
+export const LOAD_USER_POSTS_REQUEST = "LOAD_USER_POSTS_REQUEST";
+export const LOAD_USER_POSTS_SUCCESS = "LOAD_USER_POSTS_SUCCESS";
+export const LOAD_USER_POSTS_FAILURE = "LOAD_USER_POSTS_FAILURE";
+
+export const LOAD_HASHTAG_POSTS_REQUEST = "LOAD_HASHTAG_POSTS_REQUEST";
+export const LOAD_HASHTAG_POSTS_SUCCESS = "LOAD_HASHTAG_POSTS_SUCCESS";
+export const LOAD_HASHTAG_POSTS_FAILURE = "LOAD_HASHTAG_POSTS_FAILURE";
+
+export const LOAD_POST_REQUEST = "LOAD_POST_REQUEST";
+export const LOAD_POST_SUCCESS = "LOAD_POST_SUCCESS";
+export const LOAD_POST_FAILURE = "LOAD_POST_FAILURE";
 
 export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
 export const LOAD_POSTS_SUCCESS = "LOAD_POSTS_SUCCESS";
@@ -150,17 +166,40 @@ const reducer = (state = initialState, action) => {
         draft.likePostsError = action.Error;
         break;
 
+      case LOAD_POST_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
+        draft.loadPostLoading = true; // state대신 draft 사용
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_SUCCESS:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.singlePost = action.data; // 아래로 추가해서 이어붙여주는 구조
+        break;
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostError = action.Error;
+        break;
+
+      case LOAD_USER_POSTS_REQUEST:
+      case LOAD_HASHTAG_POSTS_REQUEST:
       case LOAD_POSTS_REQUEST: // 변수로 지정해주면 오타가 날 확률이 줄어드므로 상수로 만드는 것도 좋다.
         draft.loadPostsLoading = true; // state대신 draft 사용
         draft.loadPostsDone = false;
         draft.loadPostsError = null;
         break;
+
+      case LOAD_USER_POSTS_SUCCESS:
+      case LOAD_HASHTAG_POSTS_SUCCESS:
       case LOAD_POSTS_SUCCESS:
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
         draft.mainPosts = draft.mainPosts.concat(action.data); // 아래로 추가해서 이어붙여주는 구조
         draft.hasMorePosts = draft.mainPosts.length === 10;
         break;
+
+      case LOAD_USER_POSTS_FAILURE:
+      case LOAD_HASHTAG_POSTS_FAILURE:
       case LOAD_POSTS_FAILURE:
         draft.loadPostsLoading = false;
         draft.loadPostsError = action.Error;

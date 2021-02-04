@@ -1,13 +1,15 @@
 const express = require("express");
-const { User, Post } = require("../models"); // db.User
+const { User, Post, Comment, Image } = require("../models"); // db.User
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const db = require("../models");
 const router = express.Router();
 const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
+const { Op } = require("sequelize");
 
 router.get("/", async (req, res, next) => {
   // 새로 고침할 때 로그인이 유지되게끔,
+  console.log(req.headers);
   try {
     if (req.user) {
       // 확실하게 로그인 되어있을 때만 찾도록
@@ -41,6 +43,103 @@ router.get("/", async (req, res, next) => {
     }
   } catch (err) {
     console.error(err);
+    next(error);
+  }
+});
+
+router.get("/:id", async (req, res, next) => {
+  // GET /user/3
+  try {
+    const fullUserWithoutPassword = await User.findOne({
+      where: { id: req.params.id },
+      attributes: {
+        exclude: ["password"],
+      },
+      include: [
+        {
+          model: Post,
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followings",
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followers",
+          attributes: ["id"],
+        },
+      ],
+    });
+    if (fullUserWithoutPassword) {
+      const data = fullUserWithoutPassword.toJSON();
+      data.Posts = data.Posts.length; // 길이를 삽입해서 길이외에 정보들은 안나오도록 (보안)
+      data.Followings = data.Followings.length;
+      data.Followers = data.Followers.length;
+      res.status(200).json(data);
+    } else {
+      res.status(404).json("존재하지 않는 사용자입니다.");
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.get("/:userId/posts", async (req, res, next) => {
+  // GET /user/1/posts
+  try {
+    const where = { UserId: req.params.userId };
+    if (parseInt(req.query.lastId, 10)) {
+      // 초기 로딩이 아닐 때
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+    } // 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
+    const posts = await Post.findAll({
+      where,
+      limit: 10,
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          attributes: ["id", "nickname"],
+        },
+        {
+          model: Image,
+        },
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+              order: [["createdAt", "DESC"]],
+            },
+          ],
+        },
+        {
+          model: User, // 좋아요 누른 사람
+          as: "Likers",
+          attributes: ["id"],
+        },
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
+      ],
+    });
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 });
