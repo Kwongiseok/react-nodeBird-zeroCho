@@ -71,8 +71,9 @@ export const getServerSideProps = wrapper.getServerSideProps(
     const cookie = context.req ? context.req.headers.cookie : "";
     // axios.defaults.headers.Cookie = cookie; // 다른 사람이 요청을 보냈을 때도, 내 정보로 로그인 되버리는 오류가 발생할 수 있다.
     axios.defaults.headers.Cookie = ""; // 쿠키를 안쓰고 요청할 때는 서버에서 공유하고 있는 쿠키를 제거해줘야한다!
-    if (context.req && cookie) { // 쿠키를 써서 요청을 보낼 때만 쿠키를 넣어놓고
-      axios.defaults.headers.Cookie = cookie;
+    if (context.req && cookie) {
+      // 쿠키를 써서 요청을 보낼 때만 쿠키를 넣어놓고
+      axios.defaults.headers.Cookie = cookie; // 쿠키를 헤더에 넣어서 보내줘야한다.
     }
     // next에서 제공하는 wrapper로 만든 wrapper를 가져와 실행한다. -> 이 부분이 Home 보다 먼저 실행된다.
     context.store.dispatch({
